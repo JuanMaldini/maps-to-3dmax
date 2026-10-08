@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>maps-to-3dmax — Ronda 1</title>
+<style>
+:root{--bg:#0f1215;--s:#161a1e;--s2:#1c2228;--line:#29313a;--tx:#e1e5e9;--mut:#929da7;--faint:#64707b;--acc:#67b77d;--blue:#7ba5f4;--warn:#e1a75a;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.55 "Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:10;background:#0f1215ee;border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.head{max-width:980px;margin:auto;padding:13px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.brand{font-weight:650}.badge{font:600 11px var(--mono);color:var(--acc);border:1px solid #31523b;border-radius:5px;padding:4px 7px}.grow{flex:1}
+button{font:inherit;color:var(--tx);background:var(--s2);border:1px solid var(--line);border-radius:6px;padding:7px 11px;cursor:pointer}button:hover{border-color:#44505c}.primary{background:var(--acc);border-color:var(--acc);color:#0c1510;font-weight:650}
+.progress{height:3px;background:var(--s2)}.progress i{display:block;height:100%;width:0;background:var(--acc);transition:.2s}
+main{max-width:980px;margin:auto;padding:24px 20px 100px}.intro,.finding{border:1px solid var(--line);border-radius:9px;background:var(--s);padding:18px 20px;margin-bottom:16px}.intro h1{font-size:20px;margin:0 0 8px}.intro p,.finding p{margin:7px 0;color:var(--mut)}.intro code,.finding code{font:12.5px var(--mono);color:var(--tx)}.finding{border-color:#4b3c22;background:#1d1913}.finding strong{color:var(--warn)}.finding q{color:var(--tx);font-style:italic}
+section{border:1px solid var(--line);border-radius:9px;background:var(--s);margin:14px 0;overflow:hidden}.section-head{padding:14px 17px;display:flex;gap:10px;align-items:center;cursor:pointer}.section-head:hover{background:var(--s2)}.key{font:700 11px var(--mono);color:var(--acc)}.title{font-weight:650;flex:1}.count{font:600 11px var(--mono);color:var(--faint)}.body{display:none;border-top:1px solid var(--line);padding:0 17px}section.open .body{display:block}.note{padding:13px 2px;color:var(--mut);border-bottom:1px dashed var(--line)}
+.q{padding:18px 2px;border-bottom:1px solid var(--line)}.q:last-child{border:0}.qh{display:flex;gap:9px;align-items:baseline}.qid{font:700 11px var(--mono);color:var(--faint)}.qt{font-weight:620}.critical{font:700 9px var(--mono);color:var(--warn);border:1px solid #584323;border-radius:4px;padding:2px 5px}.why{white-space:pre-line;color:var(--mut);font-size:13px;margin:7px 0 11px}
+pre.mock{font:12px/1.45 var(--mono);color:var(--faint);background:#101418;border:1px solid var(--line);border-radius:7px;padding:11px 13px;margin:0 0 11px;overflow-x:auto}
+.opts{display:grid;gap:7px}.option{display:flex;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:#13171b;cursor:pointer}.option:hover{border-color:#43505c}.option.selected{border-color:#3c704c;background:#152119}.option input{margin-top:3px;accent-color:var(--acc)}.option span{display:block}.option em{display:block;color:var(--mut);font-size:12.5px;font-style:normal;margin-top:2px}
+textarea{width:100%;min-height:58px;margin-top:9px;resize:vertical;background:#101418;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:9px;font:13px "Segoe UI",sans-serif}textarea:focus{outline:0;border-color:var(--blue)}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;right:20px;bottom:20px;background:#26312a;border:1px solid #42604b;border-radius:7px;padding:10px 14px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.on{opacity:1;transform:none}
+@media(max-width:640px){.head .secondary{display:none}main{padding-inline:12px}.intro,.finding{padding:15px}.body{padding-inline:12px}}
+</style>
+</head>
+<body>
+<header><div class="head"><span class="brand">maps-to-3dmax</span><span class="badge">RONDA 1</span><span id="total" class="count">0 / 24</span><span class="grow"></span><button class="secondary" id="clear">Limpiar</button><button id="copy">Copiar JSON</button><button class="primary" id="download">Descargar</button></div><div class="progress"><i id="bar"></i></div></header>
+<main>
+
+<div class="intro"><h1>Definir el plugin antes de escribir una línea</h1>
+<p>Un <code>.mzp</code> para 3ds Max que abre un visor de mapas en localhost, te deja marcar un rectángulo sobre el mundo, y trae esa zona como geometría a la escena. Empaquetado con el mismo patrón que <strong>LibrerIA3D</strong> y <strong>FormatConversor</strong>, pero <em>sin</em> auto-update: solo compilación local.</p>
+<p>Cada pregunta trae tres opciones y la primera es la recomendada, con el motivo. Si ninguna te cierra, escribí la tuya en el campo de abajo — vale más que elegir la menos mala. Las respuestas se guardan solas en este navegador; al terminar apretá <strong>Descargar</strong> y pasame el JSON.</p></div>
+
+<div class="finding"><p><strong>Antes de AA1, el dato que condiciona todo:</strong> las Map Tiles API Policies de Google dicen, sobre las Photorealistic 3D Tiles, <q>you must not pre-fetch, index, store, or cache any Content</q>, y listan como usos vetados <q>geodata extraction or resale</q> y <q>offline uses</q>. También: <q>You may overlay your own 3D objects on Photorealistic 3D Tiles as long as the 3D objects aren't extracted, traced, or otherwise derived by hand or machine from Photorealistic 3D Tiles.</q></p>
+<p>Traducido: guardar la fotomalla de Google dentro de un <code>.max</code> va contra sus términos. No es un límite técnico ni una opinión mía — es la política publicada. Hay precedente comercial que lo hace igual (Blosm vende "Google 3D cities" para Blender). Es tu decisión, y por eso es la primera pregunta.</p></div>
+
+<div id="app"></div>
+<div class="foot"><button id="copy2">Copiar JSON</button><button class="primary" id="download2">Descargar respuestas</button></div>
+</main><div class="toast" id="toast"></div>
+<script>
+const DATA=[
+
+ {k:"AA",t:"Fuentes y licencia",note:"De dónde sale la geometría. Define si el plugin es regalable, si necesita tarjeta de crédito, y cuánto detalle podés esperar.",qs:[
+
+  {id:"AA1",critical:1,q:"¿Qué rol le damos a las Photorealistic 3D Tiles de Google?",
+   why:"La malla fotogramétrica de Google es lo más lindo que existe y lo único que sus términos no te dejan guardar. Renderizarla en el navegador con atribución sí está permitido; bajarla a un .max no.",
+   pre:"Visor (navegador)            Lo que entra a Max\n  Google 3D Tiles     ---->    nada\n  o globo 2D/terreno           OSM + DEM + imagery",
+   o:[
+   ["Google solo como visor; la malla sale de fuentes abiertas (recomendada)","Ves la ciudad fotorrealista mientras encuadrás, y te llevás edificios de OSM y terreno DEM que son tuyos para siempre, sin ToS encima. Cumple la política y el resultado es geometría limpia y editable, no una sopa de triángulos."],
+   ["Visor más extracción de la fotomalla, como módulo opt-in","Máximo detalle visual, apagado por defecto y documentado con su restricción. Es lo que hace Blosm. La responsabilidad queda de tu lado, y lo que entra es una malla pesada, sin topología y con la textura horneada."],
+   ["Sin Google en absoluto","Cero API key, cero billing, cero fricción legal. El visor pasa a ser un mapa 2D o un globo con terreno e imagery abierta: menos vistoso para encuadrar, pero el plugin queda 100% regalable."]]},
+
+  {id:"AA2",q:"¿Qué capas abiertas entran en la v1?",
+   why:"Cada capa es un proveedor, un parser y un modo de falla distinto. Empezar por dos y hacerlas bien vale más que cinco a medias.",
+   o:[
+   ["Edificios (OSM) y terreno (DEM) (recomendada)","Las dos que definen una maqueta urbana. OSM da footprints con altura o número de plantas; el DEM da el relieve. Con eso ya tenés contexto usable para render."],
+   ["Solo terreno, edificios después","La mitad del trabajo y ningún parser de polígonos. Útil si lo tuyo es paisaje o topografía, inútil para contexto urbano."],
+   ["Todo de una: edificios, terreno, calles, agua y vegetación","La maqueta completa. Cada capa extra suma casos raros de OSM (multipolígonos, relations, tags inconsistentes) y aleja la primera versión que funcione."]]},
+
+  {id:"AA3",q:"¿Imagen satelital drapeada sobre el terreno?",
+   why:"Un terreno gris es inútil para presentar; uno texturado se lee solo. Pero la imagery abierta tiene menos resolución que la de Google y su propia atribución.",
+   o:[
+   ["Sí, de fuente abierta y con casilla para apagarla (recomendada)","El terreno llega texturado por defecto, que es lo que querés el 90% de las veces, y lo podés pedir pelado cuando vas a ponerle tu propio material."],
+   ["No, terreno pelado con material gris","Menos código, menos descargas, archivos livianos. Texturás en Max con lo que ya usás."],
+   ["Sí, y que la resolución la elija el usuario","Control fino sobre el peso del resultado. Suma un control más al panel y otra decisión que entender antes de apretar."]]},
+
+  {id:"AA4",q:"Si el usuario no pone API key, ¿qué pasa?",
+   why:"Google exige habilitar billing con tarjeta aunque el tier sea gratis (100.000 llamadas por mes en Essentials Map Tiles). Es una barrera real para quien solo quiere probarlo.",
+   o:[
+   ["Todo funciona sin key; la key solo mejora el visor (recomendada)","El plugin es usable de entrada, sin cuenta de Google ni tarjeta. Quien quiera el globo fotorrealista para encuadrar, pega su key en el panel."],
+   ["Sin key no abre el mapa","Un solo camino, menos código, menos estados. A cambio, nadie puede probarlo sin pasar antes por la consola de Google Cloud."],
+   ["Sin key funciona, pero con un aviso permanente","Empuja a poner la key sin bloquear. El aviso fijo se vuelve ruido si nunca pensás poner una."]]}]},
+
+ {k:"BB",t:"El panel dentro de Max",note:"Lo que se abre cuando apretás el botón. Pediste simple, minimal, flotante y no dockeable: las tres opciones cumplen eso. Cambian el techo visual y el costo.",qs:[
+
+  {id:"BB1",critical:1,q:"¿Rollout de MAXScript o panel Qt en Python?",
+   why:"Es la decisión que más código arrastra. FormatConversor usa rollout; LibrerIA3D usa Qt frameless con QSS propio. Los dos son tuyos y los dos funcionan.",
+   pre:"rollout                    Qt (PySide)\n  6 controles                control visual total\n  gris nativo de Max         QSS, iconos SVG\n  ~80 lineas .ms             qtcompat PySide2/6",
+   o:[
+   ["Rollout MAXScript clásico (recomendada)","El mapa vive en el navegador, así que el panel solo necesita 4 botones y 2 campos. Un rollout hace eso en 80 líneas, es flotante por naturaleza y no arrastra la dualidad PySide2 (Max 2024) / PySide6 (2027)."],
+   ["Panel Qt frameless, como LibrerIA3D","Control visual total: tipografía, iconos, estados, snackbar. Ya tenés el patrón resuelto y el style.qss escrito. Cuesta qtcompat, el arrastre y resize a mano, y parentar a la ventana principal de Max."],
+   ["Rollout ahora, Qt si hace falta después","Arrancás con lo barato y migrás si el panel crece. El riesgo es que migrar obligue a reescribir toda la capa de UI y sus estados."]]},
+
+  {id:"BB2",q:"¿Cuántas variables expone el panel?",
+   why:"Pediste el mínimo. Cada campo configurable es un campo que se puede configurar mal, y un caso más que soportar.",
+   o:[
+   ["Dos: carpeta de salida y API key opcional (recomendada)","Todo lo demás se decide solo o se elige en el visor web, donde hay espacio para explicarlo con dibujos en vez de con etiquetas."],
+   ["Tres: sumar las unidades de importación","Evita la sorpresa de que el modelo entre a otra escala. A cambio es un concepto que hay que entender antes de apretar nada."],
+   ["Una: solo la carpeta de salida","Lo más limpio posible. La API key pasa al visor web, donde se pega una vez y queda guardada en el navegador."]]},
+
+  {id:"BB3",q:"¿Dónde se guardan esos valores?",
+   why:"FormatConversor cifra con DPAPI porque guarda una password. Acá el secreto es una API key de Maps que igual va a viajar en la URL del navegador, así que cifrarla protege poco.",
+   o:[
+   ["Un .ini junto al script, como LibrerIA3D (recomendada)","Texto plano en la carpeta de instalación, legible y editable a mano cuando algo falla. Va al .gitignore. Es lo que hace core/config.py."],
+   ["Cifrado con DPAPI, como FormatConversor","Atado a tu usuario de Windows, ilegible para otro. Si la key igual aparece en la URL del visor, el cifrado da una sensación de seguridad que no es real."],
+   ["Nada en disco: se pide cada vez","Cero superficie. Insoportable si abrís el plugin diez veces al día."]]},
+
+  {id:"BB4",q:"¿Un botón que alterna o dos botones separados?",
+   why:"Dijiste que los botones tienen que explicar solos qué va a pasar. Un toggle es menos clics; dos botones son menos ambiguos.",
+   o:[
+   ["Un botón que cambia de cara: Abrir mapa / Cerrar mapa (recomendada)","Siempre muestra la acción disponible, nunca una apagada. Es el patrón de btnRun en FormatConversor. Ocupa la mitad y no deja dudas sobre el estado."],
+   ["Dos botones: Abrir y Cerrar","Ves las dos acciones de una. Una de las dos está siempre inútil, y hay que decidir si se deshabilita o simplemente no hace nada."],
+   ["Solo Abrir; el servidor se apaga al cerrar el panel","El mínimo absoluto de controles. Perdés la forma de apagarlo sin cerrar el panel, y un puerto abierto que no sabés cerrar incomoda."]]}]},
+
+ {k:"CC",t:"El visor web",note:"Acá vive la UI de verdad. Se sirve desde localhost y se abre en el navegador, así que hay espacio para ser visual.",qs:[
+
+  {id:"CC1",critical:1,q:"¿Cómo se marca el área?",
+   why:"Es el gesto central del plugin. Tiene que entenderse sin leer nada y tiene que poder corregirse sin empezar de cero. Ojo: en una vista 3D, arrastrar pelea con orbitar la cámara.",
+   pre:"A ---------------+        +---o----+\n|                |        |        |\n|                |   vs   o        o   arrastrar\n+--------------- B        +---o----+   y estirar",
+   o:[
+   ["Arrastrar un rectángulo, con tiradores para ajustarlo (recomendada)","Un gesto conocido de cualquier programa. El rectángulo queda vivo: lo movés y estirás de las esquinas hasta que encaje, sin rehacer nada. Muestra los km2 mientras arrastrás. En 3D se resuelve con una tecla o un modo Seleccionar."],
+   ["Clic punto A, clic punto B","Lo que describiste. Muy explícito y no pelea con la cámara, así que funciona igual de bien en 2D que en 3D. Corregir obliga a rehacer los dos clics."],
+   ["Buscar por nombre y elegir un radio","Escribís Palermo y sale un círculo ajustable. Rapidísimo para lugares con nombre, incómodo para un recorte arbitrario entre dos calles."]]},
+
+  {id:"CC2",q:"¿Cómo se controla el nivel de detalle?",
+   why:"Es el dial entre un archivo de 8 MB que entra en dos segundos y uno de 900 MB que cuelga Max. Hay que poder anticiparlo antes de apretar.",
+   o:[
+   ["Tres presets con estimación en vivo (recomendada)","Rápido / Equilibrado / Máximo, y al lado el peso y los triángulos estimados actualizándose mientras movés el rectángulo. Decidís con el número a la vista, no a ciegas."],
+   ["Slider continuo de 1 a 10","Control fino. Nadie sabe qué significa 7, y termina siendo prueba y error."],
+   ["Automático según la superficie","Cero controles: área chica trae todo, área grande simplifica. El día que querés el máximo en un área grande, no hay cómo pedirlo."]]},
+
+  {id:"CC3",q:"¿Qué pasa si el área elegida es enorme?",
+   why:"Un rectángulo de 50 por 50 km puede ser horas de descarga y una escena que no abre. Overpass además corta del lado del servidor las consultas muy grandes.",
+   o:[
+   ["Aviso claro y dejarte seguir (recomendada)","Algo como 40 min y 2 GB estimados, con el botón todavía activo. Te trata de adulto y no bloquea el caso legítimo raro."],
+   ["Tope duro que no se puede pasar","Imposible romperse. Frustrante el día que necesitás un área grande y el plugin dice que no."],
+   ["Tope duro, con una casilla para desbloquearlo","Protege por defecto y deja salida. Es un control más y una decisión más que explicar."]]},
+
+  {id:"CC4",q:"Después de apretar Enviar a 3ds Max, ¿qué hace la pestaña?",
+   why:"El proceso puede tardar minutos. Si se cierra sola perdés el progreso de vista; si queda abierta, no sabés cuándo volver a Max.",
+   o:[
+   ["Queda abierta con barra de progreso y avisa al terminar (recomendada)","Ves qué está pasando y podés encadenar otra zona sin reabrir nada. Al terminar muestra Listo, volvé a Max bien grande."],
+   ["Se cierra sola y el progreso se ve en el panel de Max","Un solo lugar donde mirar, y la atención vuelve a Max que es donde vas a trabajar. El panel es chico para mostrar progreso con detalle."],
+   ["Queda abierta y además devuelve el foco a Max","Lo mejor de los dos: seguís el progreso en la pestaña pero la ventana activa pasa a ser Max. Robar el foco es invasivo y a veces molesta."]]}]},
+
+ {k:"DD",t:"Geometría e importación",note:"Cómo llega la malla a la escena y en qué estado. Acá se define si el resultado es usable o si hay que limpiarlo a mano cada vez.",qs:[
+
+  {id:"DD1",critical:1,q:"¿En qué formato entra a 3ds Max?",
+   why:"Max NO importa glTF ni GLB de forma nativa en ninguna versión, tampoco 2026. Hay importadores de terceros (ProtoTech, el de Khronos) pero son una dependencia externa que cada usuario tiene que instalar aparte.",
+   pre:"OBJ+MTL   importFile #noPrompt using:ObjImp   nativo\nGLB       necesita plugin de terceros          externo\npymxs     construimos la malla nodo por nodo   nativo",
+   o:[
+   ["OBJ + MTL, con las opciones fijadas por INI (recomendada)","Importador nativo, sin dependencias, con UVs y materiales. Las opciones se fuerzan con ObjImp.getIniName() y setIniSetting() antes de importar: el mismo truco que ya usás con dwg_dxf_import.ini en compat.ms. Archivos grandes y en texto, pero abiertos e inspeccionables."],
+   ["Construir la malla directo con pymxs","Control total: unidades, pivotes, capas, materiales y nombres exactamente como los querés, sin intermediario ni diálogo de importación. Es bastante más código, y más lento para mallas de millones de triángulos."],
+   ["GLB, asumiendo el importador de terceros","Un archivo, PBR completo, texturas embebidas, y te queda un GLB portable para web o Unreal. Rompe en cualquier Max donde el plugin no esté instalado."]]},
+
+  {id:"DD2",q:"¿Dónde queda el origen y en qué unidades?",
+   why:"Si el modelo aterriza en las coordenadas reales, queda a millones de unidades del origen y Max empieza a tener errores de precisión y z-fighting.",
+   o:[
+   ["Centro del rectángulo en 0,0,0, respetando las unidades de la escena (recomendada)","Aterriza donde estás mirando y a la escala correcta sin tocar nada. Guardamos lat/lon del origen en un job.json al lado, por si después hace falta re-georreferenciar o alinear dos zonas."],
+   ["Centro en 0,0,0 y forzar metros","Una variable menos y siempre la misma escala. Si tu escena está en centímetros, lo que entra viene cien veces más chico."],
+   ["Coordenadas UTM reales","Dos zonas bajadas por separado calzan solas, sin alinear nada. Y Max trabaja mal tan lejos del origen: precisión flotante, z-fighting y viewport incómodo."]]},
+
+  {id:"DD3",q:"¿Cómo se organiza en la escena?",
+   why:"Lo que llega son miles de objetos. Sin estructura, el Scene Explorer queda inutilizable y no podés aislar el terreno para trabajar.",
+   o:[
+   ["Capas por tipo: Terrain / Buildings / Roads (recomendada)","Apagás y aislás por capa, que es como se trabaja en Max. Cada import nuevo suma capas con sufijo para no pisar el anterior."],
+   ["Un grupo único por importación","Un solo nodo en el Scene Explorer y movés todo junto. Para tocar una sola cosa hay que abrir el grupo."],
+   ["Objetos sueltos con prefijo en el nombre","Máxima libertad y busca bien por nombre. Miles de objetos colgando de la raíz del Scene Explorer."]]},
+
+  {id:"DD4",q:"Los edificios de OSM sin altura, ¿qué hacen?",
+   why:"En OSM buena parte de los edificios no tiene tag height ni building:levels. Es el caso más común y el que más define cómo se ve el resultado.",
+   o:[
+   ["Estimar por plantas si existe, si no una altura por defecto marcada (recomendada)","building:levels por 3 m cuando está; si no hay nada, una altura fija y el objeto marcado para que sepas cuáles son inventados. Nunca falta una manzana."],
+   ["Omitir los que no tienen dato","Solo geometría fiel. La ciudad queda llena de huecos justo donde OSM está peor mapeado."],
+   ["Todos con la misma altura por defecto","Simple y predecible, y se ve como una maqueta de cartón: pierde la variación que hace legible una ciudad."]]},
+
+  {id:"DD5",q:"¿Qué materiales trae?",
+   why:"Que entre con materiales usables ahorra media hora por escena; que entre con materiales que después hay que borrar, la cuesta.",
+   o:[
+   ["PhysicalMaterial por categoría, con la imagery en el terreno (recomendada)","Un material por tipo, ya en PhysicalMaterial que es lo que esperan V-Ray y Corona, y el terreno con su textura drapeada. Renderizás de una sin tocar nada."],
+   ["Sin materiales, solo color por categoría","Livianísimo y no ensucia el editor de materiales. Vos ponés los tuyos, que es lo que ibas a hacer igual."],
+   ["Un material por objeto","Te deja variar edificio por edificio. Miles de materiales en la escena, que es exactamente el problema que cf_splitMaterialsByLayer resuelve al revés en FormatConversor."]]}]},
+
+ {k:"EE",t:"Flujo y estado",note:"Qué pasa entre que apretás Enviar en el navegador y ves la geometría en el viewport.",qs:[
+
+  {id:"EE1",q:"¿Dónde caen los archivos descargados?",
+   why:"Son cientos de MB. Importan la limpieza del disco, y que el .max encuentre sus texturas cuando mandás la escena a otra máquina.",
+   o:[
+   ["Carpeta que elegís en el panel, una subcarpeta por zona (recomendada)","Sabés dónde está todo, lo podés borrar o archivar a mano, y lo podés apuntar al proyecto donde vive el .max para que las texturas viajen con la escena."],
+   ["Al lado del .max abierto","Las texturas siempre viajan con la escena y no hay nada que configurar. Rompe si la escena todavía no se guardó."],
+   ["En %LOCALAPPDATA%, como caché","Disco ordenado y nada que decidir. Las rutas de textura apuntan a una carpeta de sistema que nadie va a copiar al mandar la escena."]]},
+
+  {id:"EE2",q:"Cuando termina la descarga, ¿importa solo?",
+   why:"Automático es menos clics; manual te deja terminar lo que estabas haciendo antes de que aparezcan diez millones de triángulos en tu escena.",
+   o:[
+   ["Espera a que apretes Importar (recomendada)","Nada entra a tu escena sin que lo pidas. El panel avisa Listo para importar y vos decidís cuándo, que puede ser en otra escena o con otra unidad de sistema."],
+   ["Importa solo apenas termina","Un paso menos: apretás Enviar en el navegador y volvés a Max con la zona ya puesta. Si te fuiste a hacer otra cosa, volvés y te encontrás la escena cambiada."],
+   ["Importa solo si el panel sigue abierto y Max está ocioso","Automático cuando es seguro, manual cuando no. Ocioso es difícil de detectar bien, y el comportamiento se vuelve impredecible."]]},
+
+  {id:"EE3",q:"¿El panel guarda un historial de zonas?",
+   why:"Reimportar lo que ya bajaste, en otra escena o después de un reset, sin esperar la descarga de nuevo.",
+   o:[
+   ["Lista de las últimas zonas, cada una reimportable (recomendada)","Los archivos ya están en disco; el historial solo los hace visibles. Reimportar es instantáneo y sirve para probar la misma zona en varias escenas."],
+   ["Solo la última, con un botón Reimportar","Cubre el 90% de los casos con un control. Lo de antes de ayer hay que ir a buscarlo al Explorador."],
+   ["Sin historial","El panel más limpio posible. Cada reimportación es abrir el navegador y volver a marcar el rectángulo."]]}]},
+
+ {k:"FF",t:"Entorno y reparto",note:"Contra qué se prueba, cómo se abre el visor, y qué tan público es esto.",qs:[
+
+  {id:"FF1",q:"¿Qué versiones de 3ds Max hay que soportar?",
+   why:"Define el Python disponible, si hay PySide2 o PySide6, y cuántas instalaciones probar en cada cambio. LibrerIA3D y FormatConversor cortan los dos en 2024.",
+   o:[
+   ["2024 en adelante, igual que tus otros dos plugins (recomendada)","Python 3 garantizado, PhysicalMaterial en todos, y el mismo piso que ya tenés probado. install.ms rechaza versiones viejas con un mensaje claro."],
+   ["Solo la versión que usás hoy","Probás una sola cosa y no hace falta compat.ms. Cada año nuevo de Max se vuelve una migración."],
+   ["2021 en adelante","Alcanza a estudios que no actualizan. Sumás Python viejos y diferencias de API que hay que resolver a ciegas."]]},
+
+  {id:"FF2",q:"¿Dónde se abre el visor?",
+   why:"Un navegador de verdad tiene WebGL2 moderno y devtools. Embeberlo en Max se siente más integrado y es bastante más frágil.",
+   o:[
+   ["El navegador por defecto del sistema, en una pestaña (recomendada)","WebGL2 y WASM al día, devtools cuando algo falla, y cero dependencias del lado de Max. LibrerIA3D ya decidió esto mismo: el visor de FBX vive fuera de Max, en un index.html que se abre en el navegador."],
+   ["WebView2 embebido en el panel de Max","Todo en una ventana, sin cambiar de aplicación. WebView2 no viene con Max, hay que detectarlo o instalarlo, y depurar adentro es incómodo."],
+   ["Forzar Chrome si está, si no el default","Garantiza el motor contra el que probaste. Asume Chrome instalado e ignora la preferencia del usuario."]]},
+
+  {id:"FF3",q:"¿Cómo se protege el servidor local?",
+   why:"Un puerto abierto en tu máquina lo puede llamar cualquier página que tengas abierta en otra pestaña. Y este servidor escribe archivos y dispara importaciones en Max.",
+   o:[
+   ["Puerto efímero, token en la URL, bind a 127.0.0.1 (recomendada)","El puerto cambia en cada arranque y sin el token no responde nada, así que una página ajena no puede adivinar la dirección ni hablarle. Bind local significa que ninguna otra máquina de la red lo ve."],
+   ["Puerto fijo conocido, solo bind a 127.0.0.1","Predecible y fácil de documentar. Cualquier página abierta sabe la dirección y puede intentar llamarla."],
+   ["Puerto efímero sin token","El puerto cambia, lo que ya complica adivinar. Un escaneo de puertos locales desde una pestaña lo encuentra igual."]]},
+
+  {id:"FF4",q:"¿Qué tan público es el repo?",
+   why:"Cambia cuánta documentación hay que escribir y si hay que pensar en gente que no sos vos. El remote ya apunta a github.com/JuanMaldini/maps-to-3dmax. Si tenés otro nombre en mente para el plugin, ponelo en la nota.",
+   o:[
+   ["Público con licencia MIT (recomendada)","Regalable, forkeable, y no tenés que sostener nada. Obliga a que ningún path, servidor ni nombre de máquina entre al código, que es la regla que ya seguís en LibrerIA3D."],
+   ["Público sin licencia","Visible pero con todos los derechos reservados por defecto. Nadie puede usarlo legalmente, que suele ser lo contrario de lo que buscás al publicarlo."],
+   ["Privado por ahora, público cuando funcione","Iterás sin público mirando. Es fácil que se acumulen rutas y datos personales en el historial que después hay que limpiar antes de abrirlo."]]}]}
+];
+const KEY="m2m_ronda1";let state={};try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(_e){}
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function answered(q){const a=state[q.id];return !!(a&&(a.choice||(a.note||"").trim()))}
+function render(){let html="";for(const block of DATA){html+=`<section id="s${block.k}"><div class="section-head"><span class="key">${block.k}</span><span class="title">${esc(block.t)}</span><span class="count" id="c${block.k}"></span></div><div class="body"><div class="note">${esc(block.note)}</div>`;for(const q of block.qs){html+=`<div class="q"><div class="qh"><span class="qid">${q.id}</span><span class="qt">${esc(q.q)}</span>${q.critical?'<span class="critical">CRÍTICA</span>':''}</div><div class="why">${esc(q.why)}</div>${q.pre?`<pre class="mock">${esc(q.pre)}</pre>`:''}<div class="opts">`;for(const o of q.o){html+=`<label class="option"><input type="radio" name="${q.id}" value="${esc(o[0])}" data-id="${q.id}"><span>${esc(o[0])}<em>${esc(o[1])}</em></span></label>`}html+=`</div><textarea data-note="${q.id}" placeholder="Matices, condiciones o una respuesta distinta"></textarea></div>`}html+="</div></section>"}document.getElementById("app").innerHTML=html;
+ for(const block of DATA)for(const q of block.qs){const a=state[q.id]||{};if(a.choice){const inputs=document.querySelectorAll(`input[name="${q.id}"]`);for(const input of inputs)if(input.value===a.choice)input.checked=true}document.querySelector(`[data-note="${q.id}"]`).value=a.note||""}
+ document.querySelectorAll(".section-head").forEach(x=>x.onclick=()=>x.parentElement.classList.toggle("open"));document.querySelectorAll("input[data-id]").forEach(x=>x.onchange=e=>{const id=e.target.dataset.id;state[id]=state[id]||{};state[id].choice=e.target.value;save()});document.querySelectorAll("textarea[data-note]").forEach(x=>x.oninput=e=>{const id=e.target.dataset.note;state[id]=state[id]||{};state[id].note=e.target.value;save()});document.querySelector("section").classList.add("open");tick()}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));tick()}
+function tick(){let total=0,done=0;for(const b of DATA){let d=0;for(const q of b.qs){total++;if(answered(q)){done++;d++}}document.getElementById("c"+b.k).textContent=`${d}/${b.qs.length}`}document.getElementById("total").textContent=`${done} / ${total}`;document.getElementById("bar").style.width=(100*done/total)+"%";document.querySelectorAll(".option").forEach(x=>x.classList.toggle("selected",x.querySelector("input").checked))}
+function build(){const out={proyecto:"maps-to-3dmax",ronda:1,fecha:new Date().toISOString(),respuestas:{},sin_responder:[]};for(const b of DATA)for(const q of b.qs){const a=state[q.id]||{};if(!answered(q)){out.sin_responder.push(q.id);continue}const r={pregunta:q.q};if(a.choice)r.elegido=a.choice;if((a.note||"").trim())r.nota=a.note.trim();out.respuestas[q.id]=r}return JSON.stringify(out,null,2)}
+function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("on");setTimeout(()=>x.classList.remove("on"),1600)}
+function copy(){const s=build();navigator.clipboard.writeText(s).then(()=>toast("JSON copiado")).catch(()=>{const x=document.createElement("textarea");x.value=s;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove();toast("JSON copiado")})}
+function download(){const url=URL.createObjectURL(new Blob([build()],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="maps-to-3dmax-ronda1.json";a.click();URL.revokeObjectURL(url);toast("Respuestas descargadas")}
+render();document.getElementById("copy").onclick=document.getElementById("copy2").onclick=copy;document.getElementById("download").onclick=document.getElementById("download2").onclick=download;document.getElementById("clear").onclick=()=>{if(confirm("¿Borrar todas las respuestas?")){state={};localStorage.removeItem(KEY);render()}};
+</script>
+</body></html>
